@@ -3,7 +3,6 @@ class Validator {
     if (name == null) {
       return null;
     }
-
     if (name.isEmpty) {
       return 'Name can\'t be empty';
     }

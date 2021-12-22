@@ -117,7 +117,7 @@ class _LoginPageState extends State<LoginPage> {
                                             Colors.deepPurple.shade700),
                                   ),
                                   child: Text(
-                                    'Sign in',
+                                    'Log in',
                                     style: TextStyle(color: Colors.white),
                                   ),
                                 )),

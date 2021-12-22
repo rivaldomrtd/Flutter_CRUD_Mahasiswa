@@ -1,21 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:uas_ptm/auth/login.dart';
-import 'package:uas_ptm/routes/side_menu.dart';
 
-class Home extends StatefulWidget {
+class Mahasiswa extends StatefulWidget {
   @override
-  _Home createState() => _Home();
+  _Mahasiswa createState() => _Mahasiswa();
 }
 
-class _Home extends State<Home> {
+class _Mahasiswa extends State<Mahasiswa> {
   bool _isSigningOut = false;
-  int _selectedIndex = 0;
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
+  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,7 +30,7 @@ class _Home extends State<Home> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Padding(padding: EdgeInsets.only(left: 40)),
+            Padding(padding: EdgeInsets.only(left: 60)),
             Container(
               height: 32.0,
               width: 32.0,
@@ -50,11 +43,10 @@ class _Home extends State<Home> {
               ),
             ),
             Container(
-                padding: const EdgeInsets.all(8.0), child: Text('VALD00S-CRUD'))
+                padding: const EdgeInsets.all(8.0), child: Text('E-Commerce'))
           ],
         ),
       ),
-      drawer: Sidemenu(),
       body: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(
