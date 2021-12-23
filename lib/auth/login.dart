@@ -1,7 +1,12 @@
 // ignore_for_file: prefer_const_constructors
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:uas_ptm/validator/validator.dart';
 import 'package:uas_ptm/home.dart';
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -15,6 +20,27 @@ class _LoginPageState extends State<LoginPage> {
   final _focusEmail = FocusNode();
   final _focusPassword = FocusNode();
   bool _isProcessing = false;
+
+  TextEditingController _controllerPassword = new TextEditingController();
+  TextEditingController _controllerEmail = new TextEditingController();
+  var url = "http://192.168.1.9/ptm/login.php";
+
+  get http => null;
+
+  void addData() async {
+    var response = await http.post(url, body: {
+      "email": _controllerEmail.text.trim(),
+      "password": _controllerPassword.text.trim(),
+    });
+    var jsonData = jsonDecode(response.body);
+    var jsonString = jsonData['message'];
+    if (jsonString == 'success') {
+      myToast(jsonString);
+    } else {
+      myToast(jsonString);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -98,9 +124,10 @@ class _LoginPageState extends State<LoginPage> {
                                       setState(() {
                                         _isProcessing = true;
                                       });
-                                      if (_emailTextController.text != null &&
-                                          _passwordTextController.text !=
-                                              null) {
+                                      if (_emailTextController.text ==
+                                              _controllerEmail.text &&
+                                          _passwordTextController.text.trim() ==
+                                              _controllerPassword.text.trim()) {
                                         Navigator.of(context)
                                             .pushAndRemoveUntil(
                                           MaterialPageRoute(
@@ -134,4 +161,14 @@ class _LoginPageState extends State<LoginPage> {
   void doLogin(BuildContext context) {
     Navigator.of(context).pop(1);
   }
+}
+
+myToast(String toast) {
+  return Fluttertoast.showToast(
+      msg: toast,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.CENTER,
+      timeInSecForIosWeb: 1,
+      backgroundColor: Colors.red,
+      textColor: Colors.white);
 }
