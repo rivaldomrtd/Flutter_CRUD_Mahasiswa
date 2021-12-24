@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -18,17 +17,13 @@ class _LoginPage extends State<LoginPage> {
   bool error = false;
   bool showprogress = false;
   String email = "", password = "";
-
   var _email = TextEditingController();
   var _password = TextEditingController();
-
   startLogin() async {
     String apiurl = "http://192.168.1.11/ptm/login.php";
     print(email);
-
     var response = await http
         .post(Uri.parse(apiurl), body: {'email': email, 'password': password});
-
     if (response.statusCode == 200) {
       var jsondata = json.decode(response.body);
       if (jsondata["error"]) {
@@ -76,7 +71,6 @@ class _LoginPage extends State<LoginPage> {
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(
         SystemUiOverlayStyle(statusBarColor: Colors.transparent));
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.deepPurple[700],
@@ -142,7 +136,7 @@ class _LoginPage extends State<LoginPage> {
           Container(
             padding: EdgeInsets.all(10),
             child: TextField(
-              controller: _password, //set password controller
+              controller: _password,
               style: TextStyle(color: Colors.black, fontSize: 20),
               obscureText: true,
               decoration: myInputDecoration(
@@ -150,7 +144,6 @@ class _LoginPage extends State<LoginPage> {
                 icon: Icons.lock,
               ),
               onChanged: (value) {
-                // change password text
                 password = value;
               },
             ),
@@ -164,7 +157,6 @@ class _LoginPage extends State<LoginPage> {
               child: RaisedButton(
                 onPressed: () {
                   setState(() {
-                    //show progress indicator on click
                     showprogress = true;
                   });
                   startLogin();
@@ -183,14 +175,10 @@ class _LoginPage extends State<LoginPage> {
                         "LOGIN",
                         style: TextStyle(fontSize: 20, color: Colors.white),
                       ),
-                // if showprogress == true then show progress indicator
-                // else show "LOGIN NOW" text
                 colorBrightness: Brightness.dark,
                 color: Colors.deepPurple[700],
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30)
-                    //button corner radius
-                    ),
+                    borderRadius: BorderRadius.circular(30)),
               ),
             ),
           ),
@@ -201,31 +189,23 @@ class _LoginPage extends State<LoginPage> {
 
   InputDecoration myInputDecoration({String? label, IconData? icon}) {
     return InputDecoration(
-      hintText: label, //show label as placeholder
-      hintStyle: TextStyle(color: Colors.black, fontSize: 20), //hint text style
+      hintText: label,
+      hintStyle: TextStyle(color: Colors.black, fontSize: 20),
       prefixIcon: Padding(
           padding: EdgeInsets.only(left: 20, right: 10),
           child: Icon(
             icon,
             color: Colors.black,
-          )
-          //padding and icon for prefix
-          ),
-
+          )),
       contentPadding: EdgeInsets.fromLTRB(30, 20, 30, 20),
       enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
-          borderSide: BorderSide(
-              color: Colors.purple.shade700,
-              width: 2)), //default border of input
-
+          borderSide: BorderSide(color: Colors.purple.shade700, width: 2)),
       focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
-          borderSide: BorderSide(
-              color: Colors.purple.shade700, width: 2)), //focus border
-
+          borderSide: BorderSide(color: Colors.purple.shade700, width: 2)),
       fillColor: Colors.white,
-      filled: true, //set true if you want to show input background
+      filled: true,
     );
   }
 
@@ -243,10 +223,8 @@ class _LoginPage extends State<LoginPage> {
         Container(
           margin: EdgeInsets.only(right: 6.00),
           child: Icon(Icons.info, color: Colors.black),
-        ), // icon for error message
-
+        ),
         Text(text, style: TextStyle(color: Colors.black, fontSize: 18)),
-        //show error message text
       ]),
     );
   }
