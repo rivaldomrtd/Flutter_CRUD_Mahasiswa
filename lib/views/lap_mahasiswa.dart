@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:uas_ptm/auth/login.dart';
+import 'package:uas_ptm/routes/side_menu.dart';
 
 class Lap_Mahasiswa extends StatefulWidget {
   @override
@@ -13,24 +14,11 @@ class _Lap_Mahasiswa extends State<Lap_Mahasiswa> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        actions: <Widget>[
-          IconButton(
-            icon: const Icon(Icons.logout),
-            tooltip: 'Log Out',
-            onPressed: () {
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(
-                  builder: (context) => LoginPage(),
-                ),
-              );
-            },
-          ),
-        ],
         backgroundColor: Colors.deepPurple[700],
         title: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Padding(padding: EdgeInsets.only(left: 60)),
+            Padding(padding: EdgeInsets.only(left: 40)),
             Container(
               height: 32.0,
               width: 32.0,
@@ -43,10 +31,11 @@ class _Lap_Mahasiswa extends State<Lap_Mahasiswa> {
               ),
             ),
             Container(
-                padding: const EdgeInsets.all(8.0), child: Text('E-Commerce'))
+                padding: const EdgeInsets.all(8.0), child: Text('VALD00S-CRUD'))
           ],
         ),
       ),
+      drawer: Sidemenu(),
       body: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(

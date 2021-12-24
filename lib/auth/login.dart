@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
-import 'package:uas_ptm/home.dart';
+import 'package:uas_ptm/views/mahasiswa.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -20,7 +20,7 @@ class _LoginPage extends State<LoginPage> {
   var _email = TextEditingController();
   var _password = TextEditingController();
   startLogin() async {
-    String apiurl = "http://192.168.1.11/ptm/login.php";
+    String apiurl = "http://192.168.43.168/ptm/login.php";
     print(email);
     var response = await http
         .post(Uri.parse(apiurl), body: {'email': email, 'password': password});
@@ -40,7 +40,7 @@ class _LoginPage extends State<LoginPage> {
           });
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => Home()),
+            MaterialPageRoute(builder: (context) => Mahasiswa()),
           );
         } else {
           showprogress = false;
