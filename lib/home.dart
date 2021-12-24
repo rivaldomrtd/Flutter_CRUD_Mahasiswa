@@ -20,19 +20,6 @@ class _Home extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        actions: <Widget>[
-          IconButton(
-            icon: const Icon(Icons.logout),
-            tooltip: 'Log Out',
-            onPressed: () {
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(
-                  builder: (context) => LoginPage(),
-                ),
-              );
-            },
-          ),
-        ],
         backgroundColor: Colors.deepPurple[700],
         title: Row(
           mainAxisAlignment: MainAxisAlignment.start,

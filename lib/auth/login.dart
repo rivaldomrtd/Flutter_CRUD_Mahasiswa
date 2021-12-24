@@ -1,48 +1,82 @@
-// ignore_for_file: prefer_const_constructors
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:uas_ptm/validator/validator.dart';
+import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
 import 'package:uas_ptm/home.dart';
-import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   @override
-  _LoginPageState createState() => _LoginPageState();
+  State<StatefulWidget> createState() {
+    return _LoginPage();
+  }
 }
 
-class _LoginPageState extends State<LoginPage> {
-  final _formKey = GlobalKey<FormState>();
-  final _emailTextController = TextEditingController();
-  final _passwordTextController = TextEditingController();
-  final _focusEmail = FocusNode();
-  final _focusPassword = FocusNode();
-  bool _isProcessing = false;
+class _LoginPage extends State<LoginPage> {
+  String errormsg = "";
+  bool error = false;
+  bool showprogress = false;
+  String email = "", password = "";
 
-  TextEditingController _controllerPassword = new TextEditingController();
-  TextEditingController _controllerEmail = new TextEditingController();
-  var url = "http://192.168.1.9/ptm/login.php";
+  var _email = TextEditingController();
+  var _password = TextEditingController();
 
-  get http => null;
+  startLogin() async {
+    String apiurl = "http://192.168.1.11/ptm/login.php";
+    print(email);
 
-  void addData() async {
-    var response = await http.post(url, body: {
-      "email": _controllerEmail.text.trim(),
-      "password": _controllerPassword.text.trim(),
-    });
-    var jsonData = jsonDecode(response.body);
-    var jsonString = jsonData['message'];
-    if (jsonString == 'success') {
-      myToast(jsonString);
+    var response = await http
+        .post(Uri.parse(apiurl), body: {'email': email, 'password': password});
+
+    if (response.statusCode == 200) {
+      var jsondata = json.decode(response.body);
+      if (jsondata["error"]) {
+        setState(() {
+          showprogress = false;
+          error = true;
+          errormsg = jsondata["message"];
+        });
+      } else {
+        if (jsondata["success"]) {
+          setState(() {
+            error = false;
+            showprogress = false;
+          });
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => Home()),
+          );
+        } else {
+          showprogress = false;
+          error = true;
+          errormsg = "Something went wrong.";
+        }
+      }
     } else {
-      myToast(jsonString);
+      setState(() {
+        showprogress = false;
+        error = true;
+        errormsg = "Error during connecting to server.";
+      });
     }
   }
 
   @override
+  void initState() {
+    email = "";
+    password = "";
+    errormsg = "";
+    error = false;
+    showprogress = false;
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(
+        SystemUiOverlayStyle(statusBarColor: Colors.transparent));
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.deepPurple[700],
@@ -51,124 +85,169 @@ class _LoginPageState extends State<LoginPage> {
           'Login',
         ),
         leading: new IconButton(
-          icon: new Icon(Icons.home),
+          icon: new Icon(Icons.vpn_key),
           onPressed: () {},
         ),
       ),
       body: SingleChildScrollView(
-          padding: EdgeInsets.only(top: 30, bottom: 30, left: 60, right: 60),
-          child: Center(
-              child: Column(
-            children: [
-              Container(
-                height: 150.0,
-                width: 150.0,
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage('images/1.png'),
-                    fit: BoxFit.fill,
-                  ),
-                  shape: BoxShape.circle,
-                ),
-              ),
-              Form(
-                  key: _formKey,
-                  child: Column(
-                    children: <Widget>[
-                      TextFormField(
-                        controller: _emailTextController,
-                        focusNode: _focusEmail,
-                        validator: (value) => Validator.validateEmail(
-                          email: value,
-                        ),
-                        decoration: InputDecoration(
-                          hintText: "Email",
-                          errorBorder: UnderlineInputBorder(
-                            borderRadius: BorderRadius.circular(6.0),
-                            borderSide: BorderSide(
-                              color: Colors.red,
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 8.0),
-                      TextFormField(
-                        controller: _passwordTextController,
-                        focusNode: _focusPassword,
-                        obscureText: true,
-                        validator: (value) => Validator.validatePassword(
-                          password: value,
-                        ),
-                        decoration: InputDecoration(
-                          hintText: "Password",
-                          errorBorder: UnderlineInputBorder(
-                            borderRadius: BorderRadius.circular(6.0),
-                            borderSide: BorderSide(
-                              color: Colors.red,
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 24.0),
-                      _isProcessing
-                          ? CircularProgressIndicator()
-                          : Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
-                                    child: ElevatedButton(
-                                  onPressed: () async {
-                                    _focusEmail.unfocus();
-                                    _focusPassword.unfocus();
-                                    if (_formKey.currentState!.validate()) {
-                                      setState(() {
-                                        _isProcessing = true;
-                                      });
-                                      if (_emailTextController.text ==
-                                              _controllerEmail.text &&
-                                          _passwordTextController.text.trim() ==
-                                              _controllerPassword.text.trim()) {
-                                        Navigator.of(context)
-                                            .pushAndRemoveUntil(
-                                          MaterialPageRoute(
-                                            builder: (context) => Home(),
-                                          ),
-                                          ModalRoute.withName('/'),
-                                        );
-                                      }
-                                    }
-                                  },
-                                  style: ButtonStyle(
-                                    backgroundColor:
-                                        MaterialStateProperty.all<Color>(
-                                            Colors.deepPurple.shade700),
-                                  ),
-                                  child: Text(
-                                    'Log in',
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                )),
-                                SizedBox(width: 24.0),
-                              ],
-                            )
-                    ],
-                  ))
+          child: Container(
+        constraints:
+            BoxConstraints(minHeight: MediaQuery.of(context).size.height),
+        width: MediaQuery.of(context).size.width,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topRight,
+            end: Alignment.bottomLeft,
+            colors: [
+              Colors.white,
+              Colors.white,
+              Colors.white,
+              Colors.white,
             ],
-          ))),
+          ),
+        ),
+        padding: EdgeInsets.all(20),
+        child: Column(children: <Widget>[
+          Container(
+            height: 150.0,
+            width: 150.0,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('images/1.png'),
+                fit: BoxFit.fill,
+              ),
+              shape: BoxShape.circle,
+            ),
+          ),
+          Container(
+            margin: EdgeInsets.only(top: 30),
+            padding: EdgeInsets.all(10),
+            child: error ? errmsg(errormsg) : Container(),
+          ),
+          Container(
+            padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+            margin: EdgeInsets.only(top: 10),
+            child: TextField(
+              controller: _email,
+              style: TextStyle(color: Colors.black, fontSize: 20),
+              decoration: myInputDecoration(
+                label: "Email",
+                icon: Icons.person,
+              ),
+              onChanged: (value) {
+                email = value;
+              },
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.all(10),
+            child: TextField(
+              controller: _password, //set password controller
+              style: TextStyle(color: Colors.black, fontSize: 20),
+              obscureText: true,
+              decoration: myInputDecoration(
+                label: "Password",
+                icon: Icons.lock,
+              ),
+              onChanged: (value) {
+                // change password text
+                password = value;
+              },
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.all(10),
+            margin: EdgeInsets.only(top: 20),
+            child: SizedBox(
+              height: 60,
+              width: double.infinity,
+              child: RaisedButton(
+                onPressed: () {
+                  setState(() {
+                    //show progress indicator on click
+                    showprogress = true;
+                  });
+                  startLogin();
+                },
+                child: showprogress
+                    ? SizedBox(
+                        height: 30,
+                        width: 30,
+                        child: CircularProgressIndicator(
+                          backgroundColor: Colors.white,
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.black),
+                        ),
+                      )
+                    : Text(
+                        "LOGIN",
+                        style: TextStyle(fontSize: 20, color: Colors.white),
+                      ),
+                // if showprogress == true then show progress indicator
+                // else show "LOGIN NOW" text
+                colorBrightness: Brightness.dark,
+                color: Colors.deepPurple[700],
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30)
+                    //button corner radius
+                    ),
+              ),
+            ),
+          ),
+        ]),
+      )),
     );
   }
 
-  void doLogin(BuildContext context) {
-    Navigator.of(context).pop(1);
-  }
-}
+  InputDecoration myInputDecoration({String? label, IconData? icon}) {
+    return InputDecoration(
+      hintText: label, //show label as placeholder
+      hintStyle: TextStyle(color: Colors.black, fontSize: 20), //hint text style
+      prefixIcon: Padding(
+          padding: EdgeInsets.only(left: 20, right: 10),
+          child: Icon(
+            icon,
+            color: Colors.black,
+          )
+          //padding and icon for prefix
+          ),
 
-myToast(String toast) {
-  return Fluttertoast.showToast(
-      msg: toast,
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.CENTER,
-      timeInSecForIosWeb: 1,
-      backgroundColor: Colors.red,
-      textColor: Colors.white);
+      contentPadding: EdgeInsets.fromLTRB(30, 20, 30, 20),
+      enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30),
+          borderSide: BorderSide(
+              color: Colors.purple.shade700,
+              width: 2)), //default border of input
+
+      focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30),
+          borderSide: BorderSide(
+              color: Colors.purple.shade700, width: 2)), //focus border
+
+      fillColor: Colors.white,
+      filled: true, //set true if you want to show input background
+    );
+  }
+
+  Widget errmsg(String text) {
+    //error message widget.
+    return Container(
+      padding: EdgeInsets.all(15.00),
+      margin: EdgeInsets.only(bottom: 10.00),
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(30),
+          color: Colors.red,
+          border: Border.all(color: Colors.black, width: 1)),
+      child:
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+        Container(
+          margin: EdgeInsets.only(right: 6.00),
+          child: Icon(Icons.info, color: Colors.black),
+        ), // icon for error message
+
+        Text(text, style: TextStyle(color: Colors.black, fontSize: 18)),
+        //show error message text
+      ]),
+    );
+  }
 }
