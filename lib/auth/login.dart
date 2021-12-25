@@ -20,7 +20,7 @@ class _LoginPage extends State<LoginPage> {
   var _email = TextEditingController();
   var _password = TextEditingController();
   startLogin() async {
-    String apiurl = "http://192.168.1.11/ptm/login.php";
+    String apiurl = "http://192.168.1.12/ptm/login.php";
     print(email);
     var response = await http
         .post(Uri.parse(apiurl), body: {'email': email, 'password': password});

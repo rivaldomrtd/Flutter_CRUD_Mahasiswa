@@ -1,6 +1,10 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 import 'package:date_time_picker/date_time_picker.dart';
 
 class Mahasiswa extends StatefulWidget {
@@ -39,6 +43,38 @@ class _Mahasiswa extends State<Mahasiswa> {
       "dosen_wali": controller_dosen.text,
       "foto": controller_foto.text,
     });
+  }
+
+  File? uploadimage; //variable for choosed file
+
+  Future<void> chooseImage() async {
+    var choosedimage = await ImagePicker.pickImage(source: ImageSource.gallery);
+    setState(() {
+      uploadimage = choosedimage;
+    });
+  }
+
+  Future<void> uploadImage() async {
+    String uploadurl = "http://192.168.1.12/ptm/image.php";
+    try {
+      List<int> imageBytes = uploadimage!.readAsBytesSync();
+      String baseimage = base64Encode(imageBytes);
+      var response = await http.post(uploadurl, body: {
+        'image': baseimage,
+      });
+      if (response.statusCode == 200) {
+        var jsondata = json.decode(response.body);
+        if (jsondata["error"]) {
+          print(jsondata["msg"]);
+        } else {
+          print("Upload successful");
+        }
+      } else {
+        print("Error during connection to server");
+      }
+    } catch (e) {
+      print("Error during converting to Base64");
+    }
   }
 
   @override
@@ -371,6 +407,60 @@ class _Mahasiswa extends State<Mahasiswa> {
                   ],
                 ),
                 Padding(padding: EdgeInsets.only(bottom: 10)),
+                Row(
+                  children: <Widget>[
+                    Padding(padding: EdgeInsets.only(bottom: 20, left: 5)),
+                    Container(
+                      width: 100,
+                      child: Text(
+                        "Foto",
+                        style: TextStyle(
+                          fontSize: 14,
+                        ),
+                        textAlign: TextAlign.left,
+                      ),
+                    ),
+                    Container(
+                        //show image here after choosing image
+                        child: uploadimage == null
+                            ? Container()
+                            : //if uploadimage is null then show empty container
+                            Container(
+                                //elese show image here
+                                child: SizedBox(
+                                    height: 150,
+                                    child: Image.file(
+                                        uploadimage!) //load image from file
+                                    ))),
+                    Padding(padding: EdgeInsets.only(left: 10)),
+                    Column(
+                      children: <Widget>[
+                        Container(
+                          child: RaisedButton.icon(
+                            onPressed: () {
+                              chooseImage(); // call choose image function
+                            },
+                            icon: Icon(Icons.folder_open),
+                            label: Text(""),
+                            color: Colors.deepOrangeAccent,
+                            colorBrightness: Brightness.dark,
+                          ),
+                        ),
+                        Container(
+                          child: RaisedButton.icon(
+                            onPressed: () {
+                              chooseImage(); // call choose image function
+                            },
+                            icon: Icon(Icons.photo_camera),
+                            label: Text(""),
+                            color: Colors.deepOrangeAccent,
+                            colorBrightness: Brightness.dark,
+                          ),
+                        )
+                      ],
+                    )
+                  ],
+                ),
                 Padding(
                   padding: const EdgeInsets.all(10.0),
                 ),
@@ -380,6 +470,7 @@ class _Mahasiswa extends State<Mahasiswa> {
                   onPressed: () {
                     addData();
                     Navigator.pop(context);
+                    uploadImage();
                   },
                 )
               ],
