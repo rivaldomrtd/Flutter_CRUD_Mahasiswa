@@ -1,8 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:uas_ptm/auth/login.dart';
+import 'package:uas_ptm/routes/side_menu.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:date_time_picker/date_time_picker.dart';
@@ -28,7 +29,7 @@ class _Mahasiswa extends State<Mahasiswa> {
   final firstDate = DateTime(1950, 1);
   final lastDate = DateTime(2025, 12);
   void addData() {
-    var url = Uri.parse("http://192.168.1.11/ptm/mahasiswa.php");
+    var url = Uri.parse("http://192.168.43.43/ptm/mahasiswa.php");
 
     http.post(url, body: {
       "nbi": controller_nbi.text,
@@ -45,44 +46,109 @@ class _Mahasiswa extends State<Mahasiswa> {
     });
   }
 
-  File? uploadimage; //variable for choosed file
+  static final String uploadEndPoint = 'http://192.168.43.43/ptm/image.php';
+  Future<File>? file;
+  String status = '';
+  String? base64Image;
+  File? tmpFile;
+  String errMessage = 'Error Uploading Image';
 
-  Future<void> chooseImage() async {
-    var choosedimage = await ImagePicker.pickImage(source: ImageSource.gallery);
+  chooseImage() {
     setState(() {
-      uploadimage = choosedimage;
+      file = ImagePicker.pickImage(source: ImageSource.gallery);
+    });
+    setStatus('');
+  }
+
+  picture() {
+    setState(() {
+      file = ImagePicker.pickImage(source: ImageSource.camera);
+    });
+    setStatus('');
+  }
+
+  setStatus(String message) {
+    setState(() {
+      status = message;
     });
   }
 
-  Future<void> uploadImage() async {
-    String uploadurl = "http://192.168.1.12/ptm/image.php";
-    try {
-      List<int> imageBytes = uploadimage!.readAsBytesSync();
-      String baseimage = base64Encode(imageBytes);
-      var response = await http.post(uploadurl, body: {
-        'image': baseimage,
-      });
-      if (response.statusCode == 200) {
-        var jsondata = json.decode(response.body);
-        if (jsondata["error"]) {
-          print(jsondata["msg"]);
-        } else {
-          print("Upload successful");
-        }
-      } else {
-        print("Error during connection to server");
-      }
-    } catch (e) {
-      print("Error during converting to Base64");
+  startUpload() {
+    setStatus('Uploading Image...');
+    if (null == tmpFile) {
+      setStatus(errMessage);
+      return;
     }
+    String fileName = tmpFile!.path.split('/').last;
+    upload(fileName);
+  }
+
+  upload(String fileName) {
+    http.post(uploadEndPoint, body: {
+      "image": base64Image,
+      "name": fileName,
+    }).then((result) {
+      setStatus(result.statusCode == 200 ? result.body : errMessage);
+    }).catchError((error) {
+      setStatus(error);
+    });
+  }
+
+  Widget showImage() {
+    return FutureBuilder<File>(
+      future: file,
+      builder: (BuildContext context, AsyncSnapshot<File> snapshot) {
+        if (snapshot.connectionState == ConnectionState.done &&
+            null != snapshot.data) {
+          tmpFile = snapshot.data;
+          base64Image = base64Encode(snapshot.data!.readAsBytesSync());
+          return Flexible(
+            child: Image.file(
+              snapshot.data!,
+              fit: BoxFit.fill,
+            ),
+          );
+        } else if (null != snapshot.error) {
+          return const Text(
+            'Error Picking Image',
+            textAlign: TextAlign.center,
+          );
+        } else {
+          return const Text(
+            'No Image Selected',
+            textAlign: TextAlign.center,
+          );
+        }
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("ADD DATA"),
+        backgroundColor: Colors.deepPurple[700],
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Padding(padding: EdgeInsets.only(left: 40)),
+            Container(
+              height: 32.0,
+              width: 32.0,
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage('images/1.png'),
+                  fit: BoxFit.fill,
+                ),
+                shape: BoxShape.circle,
+              ),
+            ),
+            Container(
+                padding: const EdgeInsets.all(8.0), child: Text('VALD00S-CRUD'))
+          ],
+        ),
       ),
+      drawer: Sidemenu(),
       body: Padding(
         padding: const EdgeInsets.all(10.0),
         child: ListView(
@@ -407,59 +473,43 @@ class _Mahasiswa extends State<Mahasiswa> {
                   ],
                 ),
                 Padding(padding: EdgeInsets.only(bottom: 10)),
-                Row(
-                  children: <Widget>[
-                    Padding(padding: EdgeInsets.only(bottom: 20, left: 5)),
-                    Container(
-                      width: 100,
-                      child: Text(
-                        "Foto",
-                        style: TextStyle(
-                          fontSize: 14,
-                        ),
-                        textAlign: TextAlign.left,
+                Container(
+                  padding: EdgeInsets.all(20.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[
+                      OutlineButton(
+                        onPressed: chooseImage,
+                        child: Text('Choose Image'),
                       ),
-                    ),
-                    Container(
-                        //show image here after choosing image
-                        child: uploadimage == null
-                            ? Container()
-                            : //if uploadimage is null then show empty container
-                            Container(
-                                //elese show image here
-                                child: SizedBox(
-                                    height: 150,
-                                    child: Image.file(
-                                        uploadimage!) //load image from file
-                                    ))),
-                    Padding(padding: EdgeInsets.only(left: 10)),
-                    Column(
-                      children: <Widget>[
-                        Container(
-                          child: RaisedButton.icon(
-                            onPressed: () {
-                              chooseImage(); // call choose image function
-                            },
-                            icon: Icon(Icons.folder_open),
-                            label: Text(""),
-                            color: Colors.deepOrangeAccent,
-                            colorBrightness: Brightness.dark,
-                          ),
+                      SizedBox(
+                        height: 20.0,
+                      ),
+                      showImage(),
+                      SizedBox(
+                        height: 20.0,
+                      ),
+                      OutlineButton(
+                        onPressed: startUpload,
+                        child: Text('Upload Image'),
+                      ),
+                      SizedBox(
+                        height: 20.0,
+                      ),
+                      Text(
+                        status,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.green,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 20.0,
                         ),
-                        Container(
-                          child: RaisedButton.icon(
-                            onPressed: () {
-                              chooseImage(); // call choose image function
-                            },
-                            icon: Icon(Icons.photo_camera),
-                            label: Text(""),
-                            color: Colors.deepOrangeAccent,
-                            colorBrightness: Brightness.dark,
-                          ),
-                        )
-                      ],
-                    )
-                  ],
+                      ),
+                      SizedBox(
+                        height: 20.0,
+                      ),
+                    ],
+                  ),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(10.0),
@@ -468,9 +518,7 @@ class _Mahasiswa extends State<Mahasiswa> {
                   child: Text("ADD DATA"),
                   color: Colors.blueAccent,
                   onPressed: () {
-                    addData();
-                    Navigator.pop(context);
-                    uploadImage();
+                    startUpload();
                   },
                 )
               ],

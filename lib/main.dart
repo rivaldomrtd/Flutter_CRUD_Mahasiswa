@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:uas_ptm/auth/login.dart';
+import 'package:uas_ptm/coba.dart';
+import 'package:uas_ptm/views/mahasiswa.dart';
 
 void main() {
   runApp(const MyApp());
