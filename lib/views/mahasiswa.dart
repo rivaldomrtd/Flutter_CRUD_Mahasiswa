@@ -25,11 +25,60 @@ class _Mahasiswa extends State<Mahasiswa> {
   TextEditingController controller_ipk = TextEditingController();
   TextEditingController controller_dosen = TextEditingController();
   TextEditingController controller_foto = TextEditingController();
+  String? fakultas;
+  String? prodi;
+  List<String> prod = [];
+  List<String> _listfakultas = [
+    'F.Ekonomi',
+    'F.Teknik',
+    'F.Sosial Politik',
+    'F.Sastra',
+    'F.Hukum',
+    'F.Psikologi',
+  ];
+  List<String> _prodteknik = [
+    "Teknik Industri (S1).",
+    "Teknik Sipil (S1).",
+    "Teknik Mesin (S1).",
+    "Teknik Arsitektur (S1).",
+    "Teknik Elektro (S1).",
+    "Teknik Informatika (S1).",
+    "Magister Teknik (S2)."
+  ];
+  List<String> _prodekonomi = [
+    "Ekonomi Manajemen (S1).",
+    "Ekonomi Akuntansi (S1).",
+    "Ekonomi Pembangunan (S1).",
+    "Magister Manajemen (S2).",
+    "Doktor Ilmu Ekonomi (S3)."
+  ];
+  List<String> _prodsosopol = [
+    "Administrasi Negara (S1)",
+    "Administrasi Niaga (S1)",
+    "Ilmu Komunikasi (S1)",
+    "Magister Administrasi (S2)",
+    "Doktor Ilmu Administrasi (S3)"
+  ];
+  List<String> _prodsastra = ["Sastra Jepang (S1).", "Sastra Inggris (S1)."];
+  List<String> _prodhukum = [
+    "Ilmu Hukum (S1).",
+    "Magister Ilmu Hukum (S2).",
+    "Doktor Ilmu Hukum (S3)."
+  ];
+  List<String> _prodpsikologi = [
+    "Psikologi (S1).",
+    "Psikologi Jenjang Profesi (S2).",
+    "Magister Psikologi (S2)."
+  ];
+  String? valueChoose;
+  //
+  //
+
   DateTime selectedDate = DateTime.now();
   final firstDate = DateTime(1950, 1);
   final lastDate = DateTime(2025, 12);
   void addData() {
-    var url = Uri.parse("http://192.168.43.43/ptm/mahasiswa.php");
+    var url = Uri.parse("http://192.168.1.11/ptm/mahasiswa.php");
 
     http.post(url, body: {
       "nbi": controller_nbi.text,
@@ -46,7 +95,7 @@ class _Mahasiswa extends State<Mahasiswa> {
     });
   }
 
-  static final String uploadEndPoint = 'http://192.168.43.43/ptm/image.php';
+  static final String uploadEndPoint = 'http://192.168.1.11/ptm/image.php';
   Future<File>? file;
   String status = '';
   String? base64Image;
@@ -85,7 +134,7 @@ class _Mahasiswa extends State<Mahasiswa> {
 
   upload(String fileName) {
     http.post(uploadEndPoint, body: {
-      "image": base64Image,
+      "foto": base64Image,
       "name": fileName,
     }).then((result) {
       setStatus(result.statusCode == 200 ? result.body : errMessage);
@@ -110,12 +159,12 @@ class _Mahasiswa extends State<Mahasiswa> {
           );
         } else if (null != snapshot.error) {
           return const Text(
-            'Error Picking Image',
+            '',
             textAlign: TextAlign.center,
           );
         } else {
           return const Text(
-            'No Image Selected',
+            '',
             textAlign: TextAlign.center,
           );
         }
@@ -179,7 +228,7 @@ class _Mahasiswa extends State<Mahasiswa> {
                             hintText: ""),
                         keyboardType: TextInputType.number,
                         inputFormatters: <TextInputFormatter>[
-                          FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))
+                          FilteringTextInputFormatter.digitsOnly
                         ],
                         controller: controller_nbi,
                       ),
@@ -266,6 +315,7 @@ class _Mahasiswa extends State<Mahasiswa> {
                       child: TextField(
                         onTap: () {
                           _openDatePicker(context);
+                          FocusScope.of(context).requestFocus(new FocusNode());
                         },
                         keyboardType: TextInputType.number,
                         textAlign: TextAlign.center,
@@ -305,11 +355,7 @@ class _Mahasiswa extends State<Mahasiswa> {
                             border: OutlineInputBorder(),
                             labelText: "",
                             hintText: ""),
-                        keyboardType: TextInputType.number,
-                        inputFormatters: <TextInputFormatter>[
-                          FilteringTextInputFormatter.allow(RegExp(
-                              r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$"))
-                        ],
+                        keyboardType: TextInputType.text,
                         controller: controller_email,
                       ),
                     ),
@@ -343,37 +389,7 @@ class _Mahasiswa extends State<Mahasiswa> {
                         inputFormatters: <TextInputFormatter>[
                           FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))
                         ],
-                        controller: controller_nbi,
-                      ),
-                    ),
-                    Padding(padding: EdgeInsets.only(left: 8)),
-                  ],
-                ),
-                Padding(padding: EdgeInsets.only(bottom: 10)),
-                Row(
-                  children: <Widget>[
-                    Padding(padding: EdgeInsets.only(bottom: 20, left: 5)),
-                    Container(
-                      width: 100,
-                      child: Text(
-                        "Prodi",
-                        style: TextStyle(
-                          fontSize: 14,
-                        ),
-                        textAlign: TextAlign.left,
-                      ),
-                    ),
-                    Container(
-                      width: 200,
-                      height: 50,
-                      child: TextField(
-                        textAlign: TextAlign.center,
-                        decoration: new InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: "",
-                            hintText: ""),
-                        keyboardType: TextInputType.text,
-                        controller: controller_alamat,
+                        controller: controller_telpon,
                       ),
                     ),
                     Padding(padding: EdgeInsets.only(left: 8)),
@@ -394,16 +410,85 @@ class _Mahasiswa extends State<Mahasiswa> {
                       ),
                     ),
                     Container(
-                      width: 200,
-                      height: 50,
-                      child: TextField(
-                        textAlign: TextAlign.center,
-                        decoration: new InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: "",
-                            hintText: ""),
-                        keyboardType: TextInputType.text,
-                        controller: controller_alamat,
+                      width: 120,
+                      child: DropdownButton<String>(
+                        value: fakultas,
+                        style: TextStyle(color: Colors.black),
+                        items: _listfakultas.map((String? value) {
+                          return DropdownMenuItem(
+                            child: Text(value!),
+                            value: value,
+                          );
+                        }).toList(),
+                        hint: Text(
+                          " ",
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 5,
+                          ),
+                        ),
+                        onChanged: (String? value) {
+                          if (fakultas == 'F.Ekonomi') {
+                            prod = _prodekonomi;
+                          } else if (fakultas == 'F.Hukum') {
+                            prod = _prodhukum;
+                          } else if (fakultas == 'F.Psikologi') {
+                            prod = _prodpsikologi;
+                          } else if (fakultas == 'F.Sosial Politik') {
+                            prod = _prodsosopol;
+                          } else if (fakultas == 'F.Sastra') {
+                            prod = _prodsastra;
+                          } else if (fakultas == 'F.Teknik') {
+                            prod = _prodteknik;
+                          }
+                          setState(() {
+                            prodi = null;
+                            fakultas = value!;
+                          });
+                        },
+                      ),
+                    ),
+                    Padding(padding: EdgeInsets.only(left: 8)),
+                  ],
+                ),
+                Padding(padding: EdgeInsets.only(bottom: 10)),
+                Row(
+                  children: <Widget>[
+                    Padding(padding: EdgeInsets.only(bottom: 20, left: 5)),
+                    Container(
+                      width: 100,
+                      child: Text(
+                        "Prodi",
+                        style: TextStyle(
+                          fontSize: 14,
+                        ),
+                        textAlign: TextAlign.left,
+                      ),
+                    ),
+                    Container(
+                      width: 180,
+                      child: DropdownButton<String>(
+                        value: prodi,
+                        isExpanded: true,
+                        style: TextStyle(color: Colors.black),
+                        items: prod.map((String? value) {
+                          return DropdownMenuItem(
+                            child: Text(value!),
+                            value: value,
+                          );
+                        }).toList(),
+                        hint: Text(
+                          "Prodi",
+                          style: TextStyle(
+                            color: Colors.black26,
+                            fontSize: 16,
+                          ),
+                        ),
+                        onChanged: (prod) {
+                          setState(() {
+                            prodi = prod!;
+                          });
+                        },
                       ),
                     ),
                     Padding(padding: EdgeInsets.only(left: 8)),
@@ -436,7 +521,7 @@ class _Mahasiswa extends State<Mahasiswa> {
                         inputFormatters: <TextInputFormatter>[
                           FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))
                         ],
-                        controller: controller_nbi,
+                        controller: controller_ipk,
                       ),
                     ),
                     Padding(padding: EdgeInsets.only(left: 8)),
@@ -466,7 +551,24 @@ class _Mahasiswa extends State<Mahasiswa> {
                             labelText: "",
                             hintText: ""),
                         keyboardType: TextInputType.text,
-                        controller: controller_alamat,
+                        controller: controller_dosen,
+                      ),
+                    ),
+                    Padding(padding: EdgeInsets.only(left: 8)),
+                  ],
+                ),
+                Padding(padding: EdgeInsets.only(bottom: 10)),
+                Row(
+                  children: <Widget>[
+                    Padding(padding: EdgeInsets.only(bottom: 20, left: 5)),
+                    Container(
+                      width: 100,
+                      child: Text(
+                        "Foto",
+                        style: TextStyle(
+                          fontSize: 14,
+                        ),
+                        textAlign: TextAlign.left,
                       ),
                     ),
                     Padding(padding: EdgeInsets.only(left: 8)),
@@ -474,39 +576,39 @@ class _Mahasiswa extends State<Mahasiswa> {
                 ),
                 Padding(padding: EdgeInsets.only(bottom: 10)),
                 Container(
-                  padding: EdgeInsets.all(20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                  width: 200,
+                  height: 300,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      OutlineButton(
-                        onPressed: chooseImage,
-                        child: Text('Choose Image'),
-                      ),
-                      SizedBox(
-                        height: 20.0,
-                      ),
                       showImage(),
-                      SizedBox(
-                        height: 20.0,
-                      ),
-                      OutlineButton(
-                        onPressed: startUpload,
-                        child: Text('Upload Image'),
-                      ),
-                      SizedBox(
-                        height: 20.0,
-                      ),
-                      Text(
-                        status,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.green,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 20.0,
-                        ),
-                      ),
-                      SizedBox(
-                        height: 20.0,
+                      Padding(padding: EdgeInsets.only(left: 10)),
+                      Column(
+                        children: <Widget>[
+                          OutlineButton(
+                            onPressed: chooseImage,
+                            child: Text('Folder'),
+                          ),
+                          SizedBox(
+                            height: 20.0,
+                          ),
+                          OutlineButton(
+                            onPressed: startUpload,
+                            child: Text('Camera'),
+                          ),
+                          SizedBox(
+                            height: 20.0,
+                          ),
+                          Text(
+                            status,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.green,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 20.0,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -518,7 +620,8 @@ class _Mahasiswa extends State<Mahasiswa> {
                   child: Text("ADD DATA"),
                   color: Colors.blueAccent,
                   onPressed: () {
-                    startUpload();
+                    addData();
+                    Navigator.pop(context);
                   },
                 )
               ],

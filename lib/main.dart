@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:uas_ptm/auth/login.dart';
 import 'package:uas_ptm/coba.dart';
 import 'package:uas_ptm/views/mahasiswa.dart';
+import 'package:uas_ptm/views/lap_mahasiswa.dart';
 
 void main() {
   runApp(const MyApp());
@@ -35,7 +36,7 @@ class MyApp extends StatelessWidget {
           bodyText1: TextStyle(fontSize: 18.0),
         ),
       ),
-      home: LoginPage(),
+      home: Mahasiswa(),
     );
   }
 }

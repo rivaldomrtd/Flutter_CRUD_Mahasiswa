@@ -15,7 +15,7 @@ class UploadImageDemo extends StatefulWidget {
 
 class UploadImageDemoState extends State<UploadImageDemo> {
   //
-  static final String uploadEndPoint = 'http://192.168.43.43/ptm/image.php';
+  static final String uploadEndPoint = 'http://192.168.1.11/ptm/image.php';
   Future<File>? file;
   String status = '';
   String? base64Image;
