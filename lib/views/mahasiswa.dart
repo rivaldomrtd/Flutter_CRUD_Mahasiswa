@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:uas_ptm/auth/login.dart';
@@ -78,24 +79,22 @@ class _Mahasiswa extends State<Mahasiswa> {
   final firstDate = DateTime(1950, 1);
   final lastDate = DateTime(2025, 12);
   void addData() {
-    var url = Uri.parse("http://192.168.1.11/ptm/mahasiswa.php");
-
+    var url = Uri.parse("http://192.168.1.12/ptm/mahasiswa.php");
     http.post(url, body: {
       "nbi": controller_nbi.text,
       "nama": controller_nama.text,
       "alamat": controller_alamat.text,
-      "tgl_lahir": controller_tanggal.text,
+      "tgl_lahir": DateFormat.yMd().format(selectedDate),
       "email": controller_email.text,
       "no_telpon": controller_telpon.text,
-      "prodi": controller_prodi.text,
-      "fakultas": controller_fakultas.text,
+      "prodi": prod.toString(),
+      "fakultas": fakultas.toString(),
       "ipk": controller_ipk.text,
       "dosen_wali": controller_dosen.text,
-      "foto": controller_foto.text,
     });
   }
 
-  static final String uploadEndPoint = 'http://192.168.1.11/ptm/image.php';
+  static final String uploadEndPoint = 'http://192.168.1.12/ptm/image.php';
   Future<File>? file;
   String status = '';
   String? base64Image;
@@ -558,7 +557,7 @@ class _Mahasiswa extends State<Mahasiswa> {
                   ],
                 ),
                 Padding(padding: EdgeInsets.only(bottom: 10)),
-                Row(
+                /*Row(
                   children: <Widget>[
                     Padding(padding: EdgeInsets.only(bottom: 20, left: 5)),
                     Container(
@@ -612,7 +611,7 @@ class _Mahasiswa extends State<Mahasiswa> {
                       ),
                     ],
                   ),
-                ),
+                ),*/
                 Padding(
                   padding: const EdgeInsets.all(10.0),
                 ),
