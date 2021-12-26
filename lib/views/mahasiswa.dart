@@ -79,12 +79,7 @@ class _Mahasiswa extends State<Mahasiswa> {
   final firstDate = DateTime(1950, 1);
   final lastDate = DateTime(2025, 12);
   void addData() {
-<<<<<<< Updated upstream
-    var url = Uri.parse("http://192.168.1.12/ptm/mahasiswa.php");
-=======
     var url = Uri.parse("http://192.168.43.168/ptm/mahasiswa.php");
-
->>>>>>> Stashed changes
     http.post(url, body: {
       "nbi": controller_nbi.text,
       "nama": controller_nama.text,
@@ -99,11 +94,7 @@ class _Mahasiswa extends State<Mahasiswa> {
     });
   }
 
-<<<<<<< Updated upstream
-  static final String uploadEndPoint = 'http://192.168.1.12/ptm/image.php';
-=======
   static final String uploadEndPoint = 'http://192.168.43.168/ptm/image.php';
->>>>>>> Stashed changes
   Future<File>? file;
   String status = '';
   String? base64Image;
