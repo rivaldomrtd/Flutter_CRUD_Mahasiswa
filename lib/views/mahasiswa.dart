@@ -87,8 +87,8 @@ class _Mahasiswa extends State<Mahasiswa> {
       "tgl_lahir": DateFormat.yMd().format(selectedDate),
       "email": controller_email.text,
       "no_telpon": controller_telpon.text,
-      "prodi": prod.toString(),
-      "fakultas": fakultas.toString(),
+      "prodi": prod,
+      "fakultas": fakultas,
       "ipk": controller_ipk.text,
       "dosen_wali": controller_dosen.text,
     });
@@ -557,7 +557,7 @@ class _Mahasiswa extends State<Mahasiswa> {
                   ],
                 ),
                 Padding(padding: EdgeInsets.only(bottom: 10)),
-                /*Row(
+                Row(
                   children: <Widget>[
                     Padding(padding: EdgeInsets.only(bottom: 20, left: 5)),
                     Container(
@@ -593,7 +593,7 @@ class _Mahasiswa extends State<Mahasiswa> {
                           ),
                           OutlineButton(
                             onPressed: startUpload,
-                            child: Text('Camera'),
+                            child: Text('Upload'),
                           ),
                           SizedBox(
                             height: 20.0,
@@ -611,7 +611,7 @@ class _Mahasiswa extends State<Mahasiswa> {
                       ),
                     ],
                   ),
-                ),*/
+                ),
                 Padding(
                   padding: const EdgeInsets.all(10.0),
                 ),
